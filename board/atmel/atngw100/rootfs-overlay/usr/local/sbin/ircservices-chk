@@ -1,0 +1,35 @@
+#!/bin/sh
+#
+# Script to check whether IRC Services is running, and restart it if not.
+# Usage: ircservices-chk [-q] [ircservices-options]
+#        -q: don't write any output
+#        ircservices-options: options to pass to ircservices executable
+# If you change PIDFile in ircservices.conf, also change PIDFILE below.
+#
+# IRC Services is copyright (c) 1996-2009 Andrew Church.
+#     E-mail: <achurch@achurch.org>
+# Parts written by Andrew Kempe and others.
+# This program is free but copyrighted software; see the file GPL.txt for
+# details.
+
+PIDFILE=ircservices.pid
+
+if [ "X$1" = "X-q" ] ; then
+	exec 1>/dev/null
+	exec 2>/dev/null
+	shift
+fi
+
+ok=
+if [ -f "/usr/local/lib/ircservices/$PIDFILE" ] ; then
+	pid=`cat "/usr/local/lib/ircservices/$PIDFILE"`
+	if echo "0$pid" | grep -q '[^0-9]' ; then
+		rm -f "/usr/local/lib/ircservices/$PIDFILE"
+	elif kill -0 $pid ; then
+		ok=1
+	fi
+fi
+
+if [ ! "$ok" ] ; then
+	"/usr/local/sbin/ircservices" "$@"
+fi

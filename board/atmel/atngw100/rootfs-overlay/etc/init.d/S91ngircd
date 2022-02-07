@@ -1,0 +1,26 @@
+#!/bin/sh
+#
+# Init script for ngircd
+#
+# This goes in /usr/local/etc/rc.d and gets run at boot-time.
+
+case "$1" in
+
+    start)
+    echo " starting ngircd"
+    ngircd
+    sleep 1
+    echo " starting ircservices"
+    /usr/local/sbin/ircservices
+    ;;
+
+    stop)
+    kill -USR1 `cat /var/run/ngircd.pid`
+    ;;
+
+    *)
+    echo "usage: $0 { start | stop }" >&2
+    exit 1
+    ;;
+
+esac
